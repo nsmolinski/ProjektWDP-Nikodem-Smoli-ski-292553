@@ -31,12 +31,15 @@ def add_mushroom_at_location(mushroom):
 def append_mushroom():
     mushroom_x = random.randint(50, width - 50)
     mushroom_y = random.randint(50, height - 50)
-    mushroom_image = pygame.image.load(random.choice(mushroom_images))
-    mushrooms.append({'x': mushroom_x, 'y': mushroom_y, 'image': mushroom_image})
+    a = random.choice(mushroom_images)
+    mushroom_image = pygame.image.load(a)
+    mushrooms.append({'x': mushroom_x, 'y': mushroom_y, 'image': mushroom_image, 'type': a})
 exit_game = False
 score = 0
 append_mushroom()
-
+append_mushroom()
+append_mushroom()
+append_mushroom()
 while not exit_game:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -56,7 +59,7 @@ while not exit_game:
     for mushroom in mushrooms:
         if player_x < mushroom['x'] < player_x + player_size and \
             player_y < mushroom['y'] < player_y + player_size:
-            if mushroom['image'] == 'muchomor2.png':
+            if  mushroom['type'] == 'muchomor2.png':
                 # If the collided mushroom is 'muchomor2.png', decrement the score
                 score -= 1
             else:
