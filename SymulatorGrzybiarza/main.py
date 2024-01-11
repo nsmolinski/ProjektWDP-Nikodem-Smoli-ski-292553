@@ -3,9 +3,8 @@ import sys
 import random
 
 pygame.init()
-
-width = 1000
-height = 1000
+width = 500
+height = 500
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Symulator Grzybiarza")
 
@@ -18,25 +17,25 @@ character = pygame.image.load('teem.png')
 background = pygame.image.load('grass.png')
 
 # Dodaj ścieżki do obrazów punktów
-mushroom_images = ['muchomor.png', 'muchomor.png', 'muchomor.png']
+mushroom_images = ['muchomor2.png', 'grzyb11.png', 'grzyb2.png']
 
 # Inicjalizacja listy obiektów punktów
 mushrooms = []
 
-for _ in range(5):  # Ilość obiektów punktów na ekranie
-    mushroom_x = random.randint(50, width - 50)
-    mushroom_y = random.randint(50, height - 50)
-    mushroom_image = pygame.image.load(random.choice(mushroom_images))
-    mushrooms.append({'x': mushroom_x, 'y': mushroom_y, 'image': mushroom_image})
 
 def add_character_at_location(x, y):
     screen.blit(character, (x, y))
 
 def add_mushroom_at_location(mushroom):
     screen.blit(mushroom['image'], (mushroom['x'], mushroom['y']))
-
+def append_mushroom():
+    mushroom_x = random.randint(50, width - 50)
+    mushroom_y = random.randint(50, height - 50)
+    mushroom_image = pygame.image.load(random.choice(mushroom_images))
+    mushrooms.append({'x': mushroom_x, 'y': mushroom_y, 'image': mushroom_image})
 exit_game = False
 score = 0
+append_mushroom()
 
 while not exit_game:
     for event in pygame.event.get():
@@ -53,13 +52,18 @@ while not exit_game:
     if keys[pygame.K_DOWN] and player_y < height - player_size:
         player_y += player_speed
 
-    # Sprawdź kolizję z obiektami punktów
+    # Check collision with mushroom objects
     for mushroom in mushrooms:
         if player_x < mushroom['x'] < player_x + player_size and \
-           player_y < mushroom['y'] < player_y + player_size:
-            score += 1
+            player_y < mushroom['y'] < player_y + player_size:
+            if mushroom['image'] == 'muchomor2.png':
+                # If the collided mushroom is 'muchomor2.png', decrement the score
+                score -= 1
+            else:
+                # For other mushrooms, increment the score
+                score += 1
             mushrooms.remove(mushroom)
-
+            append_mushroom()
     # Wypełnij ekran obrazem tła
     screen.blit(background, (0, 0))
 
