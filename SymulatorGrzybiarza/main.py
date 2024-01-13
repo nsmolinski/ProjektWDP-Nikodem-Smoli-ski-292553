@@ -8,6 +8,8 @@ pygame.mixer.init()
 pygame.mixer.music.load('music.mp3')
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
+collision_sound = pygame.mixer.Sound('collectcoin.mp3')
+collision_sound.set_volume(0.5)
 width = 500
 height = 500
 screen = pygame.display.set_mode((width, height))
@@ -89,6 +91,8 @@ while not exit_game:
                 score -= 1
             else:
                 score += 1
+                collision_sound.play()
+
             mushrooms.remove(mushroom)
             append_mushroom()
     # Wypełnij ekran obrazem tła
