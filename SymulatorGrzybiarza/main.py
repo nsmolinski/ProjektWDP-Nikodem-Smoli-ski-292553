@@ -4,6 +4,10 @@ import random
 import button
 import time
 pygame.init()
+pygame.mixer.init()
+pygame.mixer.music.load('music.mp3')
+pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.play(-1)
 width = 500
 height = 500
 screen = pygame.display.set_mode((width, height))
@@ -101,6 +105,13 @@ while not exit_game:
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(score_text, (385, 10))
     if game_paused == True:
+        score = 0
+        player_size = 50
+        player_x = width // 2 - player_size // 2
+        player_y = height // 2 - player_size // 2
+        player_speed = 5
+        elapsed_time2 = pygame.time.get_ticks()
+        seconds2 = elapsed_time2 / 1000
         if menu_state == "main":
             screen.blit(menu_img, (0, 0))
             if resume_button.draw(screen):
@@ -111,11 +122,11 @@ while not exit_game:
             print("options")
     else:
         elapsed_time = pygame.time.get_ticks()
-        seconds = elapsed_time / 1000
+        seconds = elapsed_time / 1000 - seconds2
         text_surface = font.render("{:.2f}".format(seconds), True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(30, 20))
         screen.blit(text_surface, text_rect)
-        draw_text("Press ESC to pause", font, (255, 255, 255), 140, 460)
+        draw_text("Press ESC - Main Menu", font, (255, 255, 255), 120, 460)
     # Odśwież ekran
     pygame.display.flip()
 
