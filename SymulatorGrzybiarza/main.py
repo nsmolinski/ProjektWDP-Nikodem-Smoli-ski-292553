@@ -1,7 +1,8 @@
 import pygame
 import sys
 import random
-
+import button
+import time
 pygame.init()
 width = 500
 height = 500
@@ -15,14 +16,19 @@ player_speed = 5
 
 character = pygame.image.load('teem.png')
 background = pygame.image.load('grass.png')
-
+font = pygame.font.Font(None, 36)
 # Dodaj ścieżki do obrazów punktów
 mushroom_images = ['muchomor2.png', 'grzyb11.png', 'grzyb2.png']
 
 # Inicjalizacja listy obiektów punktów
 mushrooms = []
+images = []
 
-
+def display_time():
+    current_time = pygame.time.get_ticks()
+    time_surf = font.render(current_time, False, (64, 64, 64))
+    time_rect = time_surf.get_rect(center = (400, 50))
+    screen.blit(time_surf, time_rect)
 def add_character_at_location(x, y):
     screen.blit(character, (x, y))
 
@@ -34,17 +40,33 @@ def append_mushroom():
     a = random.choice(mushroom_images)
     mushroom_image = pygame.image.load(a)
     mushrooms.append({'x': mushroom_x, 'y': mushroom_y, 'image': mushroom_image, 'type': a})
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+def draw_image(image_path, x, y):
+    image = pygame.image.load(image_path)
+    screen.blit(image, (x, y))
 exit_game = False
 score = 0
+resume_img = pygame.image.load('play.png').convert_alpha()
+menu_img = pygame.image.load('bg.png').convert_alpha()
+options_img = pygame.image.load('settings.png').convert_alpha()
+resume_button = button.Button(240, 190, resume_img, 0.5)
+options_button = button.Button(130, 190, options_img, 0.5)
 append_mushroom()
-append_mushroom()
-append_mushroom()
-append_mushroom()
+game_paused = True
+menu_state = "main"
+clock = pygame.time.Clock()
+start_time = pygame.time.get_ticks()
 while not exit_game:
+    screen.blit(background, (0, 0))
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit_game = True
-
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                game_paused = True
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and player_x > 0:
         player_x -= player_speed
@@ -60,15 +82,13 @@ while not exit_game:
         if player_x < mushroom['x'] < player_x + player_size and \
             player_y < mushroom['y'] < player_y + player_size:
             if  mushroom['type'] == 'muchomor2.png':
-                # If the collided mushroom is 'muchomor2.png', decrement the score
                 score -= 1
             else:
-                # For other mushrooms, increment the score
                 score += 1
             mushrooms.remove(mushroom)
             append_mushroom()
     # Wypełnij ekran obrazem tła
-    screen.blit(background, (0, 0))
+
 
     # Dodaj postać na ekranie
     add_character_at_location(player_x, player_y)
@@ -78,10 +98,24 @@ while not exit_game:
         add_mushroom_at_location(mushroom)
 
     # Wyświetl wynik
-    font = pygame.font.Font(None, 36)
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
-    screen.blit(score_text, (10, 10))
-
+    screen.blit(score_text, (385, 10))
+    if game_paused == True:
+        if menu_state == "main":
+            screen.blit(menu_img, (0, 0))
+            if resume_button.draw(screen):
+                game_paused = False
+            if options_button.draw(screen):
+                menu_state = "options"
+        if menu_state == "options":
+            print("options")
+    else:
+        elapsed_time = pygame.time.get_ticks()
+        seconds = elapsed_time / 1000
+        text_surface = font.render("{:.2f}".format(seconds), True, (255, 255, 255))
+        text_rect = text_surface.get_rect(center=(30, 20))
+        screen.blit(text_surface, text_rect)
+        draw_text("Press ESC to pause", font, (255, 255, 255), 140, 460)
     # Odśwież ekran
     pygame.display.flip()
 
