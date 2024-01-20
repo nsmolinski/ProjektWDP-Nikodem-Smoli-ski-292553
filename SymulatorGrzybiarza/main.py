@@ -19,7 +19,9 @@ player_size = 50
 player_x = width // 2 - player_size // 2
 player_y = height // 2 - player_size // 2
 player_speed = 5
-
+mushroom_lifetime = 3
+total_game_time = 60
+total_game_time_str = ''
 character = pygame.image.load('teem.png')
 background = pygame.image.load('grass.png')
 font = pygame.font.Font(None, 36)
@@ -57,6 +59,7 @@ score = 0
 resume_img = pygame.image.load('play.png').convert_alpha()
 menu_img = pygame.image.load('bg.png').convert_alpha()
 options_img = pygame.image.load('settings.png').convert_alpha()
+options_bg = pygame.image.load('bg3.png').convert_alpha()
 resume_button = button.Button(240, 190, resume_img, 0.5)
 options_button = button.Button(130, 190, options_img, 0.5)
 append_mushroom()
@@ -64,15 +67,33 @@ game_paused = True
 menu_state = "main"
 clock = pygame.time.Clock()
 start_time = pygame.time.get_ticks()
+start_time2 = None
+start_time3 = None
+input_rect = pygame.Rect(200, 200, 200, 32)
+color = pygame.Color('green')
+
 while not exit_game:
     screen.blit(background, (0, 0))
-
+    score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+    screen.blit(score_text, (385, 10))
+    start_time3 = time.time()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit_game = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game_paused = True
+            if event.key == pygame.K_BACKSPACE:
+                total_game_time_str = total_game_time_str[:-1]
+            elif event.key == pygame.K_RETURN:
+                try:
+                    total_game_time = int(total_game_time_str)
+                except ValueError:
+                    print("Nieprawidłowy format czasu. Ustawiono domyślny czas (60 sekundy).")
+                game_paused = True
+                menu_state = "main"
+            else:
+                total_game_time_str += event.unicode
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and player_x > 0:
         player_x -= player_speed
@@ -82,21 +103,37 @@ while not exit_game:
         player_y -= player_speed
     if keys[pygame.K_DOWN] and player_y < height - player_size:
         player_y += player_speed
-
     # Check collision with mushroom objects
     for mushroom in mushrooms:
         if player_x < mushroom['x'] < player_x + player_size and \
             player_y < mushroom['y'] < player_y + player_size:
             if  mushroom['type'] == 'muchomor2.png':
                 score -= 1
+                start_time2 = time.time()
+                player_speed = 1
+
             else:
+
                 score += 1
                 collision_sound.play()
 
             mushrooms.remove(mushroom)
             append_mushroom()
-    # Wypełnij ekran obrazem tła
 
+    mushrooms_to_remove = []
+    for mushroom in mushrooms:
+        if 'spawn_time' not in mushroom:
+            mushroom['spawn_time'] = time.time()
+        elif time.time() - mushroom['spawn_time'] >= mushroom_lifetime:
+            mushrooms_to_remove.append(mushroom)
+
+    for mushroom in mushrooms_to_remove:
+        mushrooms.remove(mushroom)
+        append_mushroom()
+
+    if start_time2 is not None and time.time() - start_time2 >= 1:
+        player_speed = 5
+        start_time2 = None
 
     # Dodaj postać na ekranie
     add_character_at_location(player_x, player_y)
@@ -118,19 +155,33 @@ while not exit_game:
         seconds2 = elapsed_time2 / 1000
         if menu_state == "main":
             screen.blit(menu_img, (0, 0))
+            total_game_time_str = ''
+
             if resume_button.draw(screen):
                 game_paused = False
             if options_button.draw(screen):
                 menu_state = "options"
         if menu_state == "options":
-            print("options")
+            screen.blit(menu_img, (0, 0))
+            pygame.draw.rect(screen, color, input_rect)
+            text_surface2 = font.render(total_game_time_str, False, (255, 255, 255))
+            screen.blit(text_surface2, (input_rect.x + 5, input_rect.y + 5))
+            input_rect.w = max(100, text_surface2.get_width() + 10)
+            draw_text("Time: ", font, (255, 255, 255), 120, 203)
+
     else:
         elapsed_time = pygame.time.get_ticks()
         seconds = elapsed_time / 1000 - seconds2
+
+        if seconds >= total_game_time:
+            game_paused = True
+            menu_state = "main"
+
         text_surface = font.render("{:.2f}".format(seconds), True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(30, 20))
         screen.blit(text_surface, text_rect)
         draw_text("Press ESC - Main Menu", font, (255, 255, 255), 120, 460)
+
     # Odśwież ekran
     pygame.display.flip()
 
