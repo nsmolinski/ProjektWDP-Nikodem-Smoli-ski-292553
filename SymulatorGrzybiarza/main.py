@@ -27,7 +27,7 @@ background = pygame.image.load('grass.png')
 font = pygame.font.Font(None, 36)
 # Dodaj ścieżki do obrazów punktów
 mushroom_images = ['muchomor2.png', 'grzyb11.png', 'grzyb2.png']
-
+temp_score = 0
 # Inicjalizacja listy obiektów punktów
 mushrooms = []
 images = []
@@ -65,6 +65,7 @@ start_time2 = None
 start_time3 = None
 input_rect = pygame.Rect(200, 200, 200, 32)
 color = pygame.Color('green')
+maxtemp = 0
 #pętla gry
 while not exit_game:
     screen.blit(background, (0, 0))
@@ -77,6 +78,7 @@ while not exit_game:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game_paused = True
+
             if event.key == pygame.K_BACKSPACE:
                 total_game_time_str = total_game_time_str[:-1]
             elif event.key == pygame.K_RETURN:
@@ -141,8 +143,12 @@ while not exit_game:
 
     # Wyświetl wynik
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+
     screen.blit(score_text, (385, 10))
+    if score>= maxtemp:
+        maxtemp = score
     if game_paused == True:
+
         score = 0
         player_size = 50
         player_x = width // 2 - player_size // 2
@@ -152,6 +158,10 @@ while not exit_game:
         seconds2 = elapsed_time2 / 1000
         if menu_state == "main":
             screen.blit(menu_img, (0, 0))
+
+            score_text2 = font.render(f"Best score: {maxtemp}", True, (255, 255, 255))
+            screen.blit(score_text2, (178, 75))
+
             total_game_time_str = ''
 
             if resume_button.draw(screen):
@@ -173,6 +183,7 @@ while not exit_game:
         if seconds >= total_game_time:
             game_paused = True
             menu_state = "main"
+
 
         text_surface = font.render("{:.2f}".format(seconds), True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=(30, 20))
