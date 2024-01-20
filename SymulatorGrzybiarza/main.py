@@ -31,12 +31,6 @@ mushroom_images = ['muchomor2.png', 'grzyb11.png', 'grzyb2.png']
 # Inicjalizacja listy obiektów punktów
 mushrooms = []
 images = []
-
-def display_time():
-    current_time = pygame.time.get_ticks()
-    time_surf = font.render(current_time, False, (64, 64, 64))
-    time_rect = time_surf.get_rect(center = (400, 50))
-    screen.blit(time_surf, time_rect)
 def add_character_at_location(x, y):
     screen.blit(character, (x, y))
 
@@ -71,7 +65,7 @@ start_time2 = None
 start_time3 = None
 input_rect = pygame.Rect(200, 200, 200, 32)
 color = pygame.Color('green')
-
+#pętla gry
 while not exit_game:
     screen.blit(background, (0, 0))
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
@@ -88,8 +82,8 @@ while not exit_game:
             elif event.key == pygame.K_RETURN:
                 try:
                     total_game_time = int(total_game_time_str)
-                except ValueError:
-                    print("Nieprawidłowy format czasu. Ustawiono domyślny czas (60 sekundy).")
+                except:
+                    print("Zły czas")
                 game_paused = True
                 menu_state = "main"
             else:
@@ -103,17 +97,19 @@ while not exit_game:
         player_y -= player_speed
     if keys[pygame.K_DOWN] and player_y < height - player_size:
         player_y += player_speed
-    # Check collision with mushroom objects
+    # sprawdzenie czy weszliśmy w grzyba
     for mushroom in mushrooms:
         if player_x < mushroom['x'] < player_x + player_size and \
             player_y < mushroom['y'] < player_y + player_size:
+            start_time2 = time.time()
             if  mushroom['type'] == 'muchomor2.png':
                 score -= 1
-                start_time2 = time.time()
-                player_speed = 1
-
+                player_speed = player_speed * 0.5
+            elif mushroom['type'] == 'grzyb11.png':
+                score +=1
+                collision_sound.play()
+                player_speed = player_speed * 1.5
             else:
-
                 score += 1
                 collision_sound.play()
 
@@ -123,6 +119,7 @@ while not exit_game:
     mushrooms_to_remove = []
     for mushroom in mushrooms:
         if 'spawn_time' not in mushroom:
+            #czas od wejścia w grzyba
             mushroom['spawn_time'] = time.time()
         elif time.time() - mushroom['spawn_time'] >= mushroom_lifetime:
             mushrooms_to_remove.append(mushroom)
@@ -135,10 +132,10 @@ while not exit_game:
         player_speed = 5
         start_time2 = None
 
-    # Dodaj postać na ekranie
+    # dodanie postaci na ekran
     add_character_at_location(player_x, player_y)
 
-    # Dodaj obiekty punktów na ekranie
+    # dodanie obiektów punktów na ekranie
     for mushroom in mushrooms:
         add_mushroom_at_location(mushroom)
 
