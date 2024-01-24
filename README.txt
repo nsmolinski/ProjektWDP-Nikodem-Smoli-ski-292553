@@ -1,0 +1,1 @@
+Gra polega na zdobywaniu punktów poprzez zbieranie grzybów pojawiających się na planszy. Gracz steruje postacią za pomocą strzałek. Grzyby posiadają właściwości spowalniania lub przyspieszania gracza. Za każdy zebrany dobry grzyb gracz uzyskuje jeden punkt, a za zebranie muchomora minus jeden punkt.
