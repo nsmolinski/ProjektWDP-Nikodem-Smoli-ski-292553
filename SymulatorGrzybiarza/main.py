@@ -1,7 +1,7 @@
 import pygame
 import sys
 import random
-import button
+import buttona
 import time
 pygame.init()
 pygame.mixer.init()
@@ -19,7 +19,7 @@ player_size = 50
 player_x = width // 2 - player_size // 2
 player_y = height // 2 - player_size // 2
 player_speed = 5
-mushroom_lifetime = 3
+mushroom_lifetime = 2
 total_game_time = 60
 total_game_time_str = ''
 character = pygame.image.load('teem.png')
@@ -77,8 +77,7 @@ while not exit_game:
             exit_game = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                game_paused = True
-
+                    game_paused = True
             if event.key == pygame.K_BACKSPACE:
                 total_game_time_str = total_game_time_str[:-1]
             elif event.key == pygame.K_RETURN:
@@ -157,6 +156,7 @@ while not exit_game:
         elapsed_time2 = pygame.time.get_ticks()
         seconds2 = elapsed_time2 / 1000
         if menu_state == "main":
+            #tło menu
             screen.blit(menu_img, (0, 0))
 
             score_text2 = font.render(f"Best score: {maxtemp}", True, (255, 255, 255))
@@ -168,6 +168,7 @@ while not exit_game:
                 game_paused = False
             if options_button.draw(screen):
                 menu_state = "options"
+        #opcje
         if menu_state == "options":
             screen.blit(menu_img, (0, 0))
             pygame.draw.rect(screen, color, input_rect)
@@ -179,7 +180,7 @@ while not exit_game:
     else:
         elapsed_time = pygame.time.get_ticks()
         seconds = elapsed_time / 1000 - seconds2
-
+        #powrót do menu po upływie czasu podanego przez użytkownika
         if seconds >= total_game_time:
             game_paused = True
             menu_state = "main"
@@ -189,10 +190,8 @@ while not exit_game:
         text_rect = text_surface.get_rect(center=(30, 20))
         screen.blit(text_surface, text_rect)
         draw_text("Press ESC - Main Menu", font, (255, 255, 255), 120, 460)
-
     # Odśwież ekran
     pygame.display.flip()
-
     # Kontrola liczby klatek na sekundę
     pygame.time.Clock().tick(60)
 
